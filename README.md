@@ -1,22 +1,22 @@
-# AI Blogger Bot
+# Blogger Email Poster
 
-An intelligent automation tool that generates and publishes engaging blog posts to your Blogger site. It fetches trending topics (including cryptocurrency trends), uses AI to create high-quality content with proper thumbnail images, and automatically categorizes posts with appropriate labels.
+An automated blog content generation and email distribution system with human-like posting behavior. This bot generates high-quality blog content using AI, includes relevant images, and sends posts via email on a natural-looking schedule.
 
-This automated blogging system combines trending topic discovery, AI-powered content generation, and image integration to create professional-looking blog posts with minimal human intervention.
+This system combines trending topic discovery, AI-powered content generation, and smart scheduling to create and distribute professional-looking blog posts with minimal human intervention.
 
-> **IMPORTANT SECURITY NOTE**: This repository does not contain any sensitive API keys or credentials. You will need to create your own credential files based on the example files provided. See the [Security and Credentials](#security-and-credentials) section for details.
+> **IMPORTANT SECURITY NOTE**: This repository does not contain any sensitive API keys or credentials. You will need to create your own `.env` file with your email and API credentials. See the [Security and Credentials](#security-and-credentials) section for details.
 
 ## Features
 
 ### Core Functionality
-- 🔍 Fetches trending topics using Google Trends API with AI fallback
-- 💰 Includes cryptocurrency trends (BTC, ETH) in topic discovery
-- 📰 Creates engaging, clickable headlines using AI (without quotation marks)
+- 🔍 Fetches trending topics with AI-powered suggestions
+- � Sends blog posts via email with embedded images
+- 📰 Creates engaging, clickable headlines using AI
 - 🤖 Generates high-quality blog posts using OpenRouter AI
-- 🖼️ Automatically generates relevant images with proper thumbnails for Blogger
-- 🔄 Multi-tiered image fetching with Pixabay, Pexels, and placeholder fallbacks
-- 📝 Posts automatically to Blogger with smart label classification
-- 🏷️ Smart label classification system for better content organization
+- 🖼️ Automatically generates and embeds relevant images in emails
+- 🔄 Multi-tiered image fetching with Pixabay API integration
+- 📝 Smart HTML email formatting with proper image embedding
+- 🏷️ Content categorization for better organization
 
 ### Human-like Behavior & Anti-Spam
 - 🧠 **Human-like Posting Patterns**: Natural delays and posting schedules (3-4 posts/day, 19-27/week)
@@ -39,10 +39,10 @@ This automated blogging system combines trending topic discovery, AI-powered con
 
 ## Prerequisites
 
-1. Python 3.7 or higher
-2. A Google Cloud Project with Blogger API enabled
-3. An OpenRouter API key
-4. A Blogger blog
+1. Python 3.11 or higher
+2. Gmail account with App Password enabled (for secure email sending)
+3. OpenRouter API key
+4. Pixabay API key (optional, for better images)
 
 ## Setup Instructions
 
@@ -59,45 +59,49 @@ cd bloggerbot
 pip install -r requirements.txt
 ```
 
-### 3. Google Cloud Setup
+### 3. Gmail Setup
 
-1. Go to [Google Cloud Console](https://console.cloud.google.com)
-2. Create a new project or select an existing one
-3. Enable the Blogger API for your project
-4. Create OAuth 2.0 credentials:
-   - Go to Credentials
-   - Click "Create Credentials" > "OAuth client ID"
-   - Choose "Desktop app"
-   - Download the client configuration file
-   - Save it as `client_secrets.json` in the project directory
+1. Go to your Google Account settings
+2. Enable 2-Step Verification if not already enabled
+3. Generate an App Password:
+   - Go to Security > 2-Step Verification
+   - Scroll to "App passwords"
+   - Select "Mail" and your device
+   - Generate and copy the password
 
 ### 4. Environment Configuration
 
 Create a `.env` file in the project root with the following content:
 
 ```env
-OPENROUTER_API_KEY=your_openrouter_api_key
-BLOGGER_ID=your_blogger_id
-PIXABAY_API_KEY=your_pixabay_api_key  # Optional, for better images
+GMAIL_EMAIL=your.email@gmail.com
+GMAIL_APP_PASSWORD=your-app-specific-password
+GMAIL_SENDER_NAME=Your Name
+EMAIL_RECIPIENTS=recipient1@example.com,recipient2@example.com
+EMAIL_BCC=bcc1@example.com,bcc2@example.com
+OPENROUTER_API_KEY=your-openrouter-api-key
+PIXABAY_API_KEY=your-pixabay-api-key
 ```
 
 Replace:
+- `your.email@gmail.com` with your Gmail address
+- `your-app-specific-password` with your Gmail App Password
+- `Your Name` with your preferred sender name
+- `recipient1@example.com,recipient2@example.com` with your recipients' email addresses
+- `bcc1@example.com,bcc2@example.com` with BCC recipients (optional)
+- `your-openrouter-api-key` with your OpenRouter API key
+- `your-pixabay-api-key` with your Pixabay API key
 
-- `your_openrouter_api_key` with your OpenRouter API key
-- `your_blogger_id` with your Blogger blog ID (find it in your Blogger URL or settings)
-- `your_pixabay_api_key` with your Pixabay API key (optional, get a free key at [Pixabay API](https://pixabay.com/api/docs/))
+### 5. Test Email Configuration
 
-### 5. Generate Google OAuth Token
-
-1. Run the authentication script:
+1. Check your environment variables are set correctly
+2. Run the bot to test email sending:
 
 ```bash
-python src/get_token.py
+python main.py --test-email
 ```
 
-2. Follow the browser prompts to authenticate
-3. Allow the application access to your Blogger account
-4. The script will generate `config/token.json`
+This will send a test email to verify your configuration.
 
 ## Usage
 
@@ -443,34 +447,46 @@ The bot can run automatically using GitHub Actions. To set this up:
 
 ### Workflow Schedule
 
-The bot is configured to run every hour by default. You can modify this in `.github/workflows/bot.yml`:
+The bot follows a human-like posting schedule defined in `.github/workflows/email-poster.yml`:
 
-```yaml
-on:
-  schedule:
-    - cron: "0 */1 * * *" # Runs every hour
-```
+#### Weekdays (Mon-Fri):
+- 9:30 AM UTC (First post window)
+- 1:15 PM UTC (Second post window, ~4h gap)
+- 4:45 PM UTC (Third post window, ~3.5h gap)
 
-Common cron examples:
+#### Weekends (Sat-Sun):
+- 10:30 AM UTC (Weekend morning)
+- 3:15 PM UTC (Weekend afternoon)
 
-- Every 2 hours: `0 */2 * * *`
-- Every 6 hours: `0 */6 * * *`
-- Twice daily: `0 */12 * * *`
-- Once daily: `0 0 * * *`
+This schedule is designed to:
+- Maintain consistent posting during business hours
+- Reduce frequency on weekends
+- Add natural variation between posts
+- Avoid spam detection
 
 ### Manual Trigger
 
 You can also trigger the bot manually:
 
 1. Go to the "Actions" tab
-2. Select "Blogger Auto Bot"
+2. Select "BloggerBot Email Poster"
 3. Click "Run workflow"
+4. Optionally enable "Force run ignoring schedule"
 
-### Monitoring GitHub Actions
+### Monitoring
 
-Check the "Actions" tab to:
+Monitor your bot's activity through:
 
-- View run history
-- Check execution logs
-- Monitor for any errors
-- Verify successful posts
+1. GitHub Actions:
+   - View run history
+   - Check execution logs
+   - Monitor for any errors
+
+2. Email Delivery:
+   - Check your sent emails folder
+   - Monitor recipient feedback
+   - Check spam folder if emails aren't arriving
+
+3. Log Files:
+   - Review `logs/blogger_bot.log` for detailed operation logs
+   - Check rate limits in `rate_limits/blogger_api_calls.json`
