@@ -4,16 +4,16 @@ on:
   schedule:
     # Following moderate pattern (4-8 hours between posts)
     # Random minutes to add human-like variation
-    - cron: "30 9 * * 1-5" # 9:30 AM UTC (First post window)
-    - cron: "15 13 * * 1-5" # 1:15 PM UTC (Second post window, ~4h gap)
-    - cron: "45 16 * * 1-5" # 4:45 PM UTC (Third post window, ~3.5h gap)
+    - cron: "30 9 * * 1-5"   # 9:30 AM UTC (First post window)
+    - cron: "15 13 * * 1-5"  # 1:15 PM UTC (Second post window, ~4h gap)
+    - cron: "45 16 * * 1-5"  # 4:45 PM UTC (Third post window, ~3.5h gap)
     # Weekend schedule (reduced frequency)
-    - cron: "30 10 * * 0,6" # 10:30 AM UTC (Weekend morning)
-    - cron: "15 15 * * 0,6" # 3:15 PM UTC (Weekend afternoon)
-  workflow_dispatch: # Allows manual triggering
+    - cron: "30 10 * * 0,6"  # 10:30 AM UTC (Weekend morning)
+    - cron: "15 15 * * 0,6"  # 3:15 PM UTC (Weekend afternoon)
+  workflow_dispatch:  # Allows manual triggering
     inputs:
       force_run:
-        description: "Force run ignoring schedule"
+        description: 'Force run ignoring schedule'
         required: false
         default: true
         type: boolean
@@ -98,7 +98,7 @@ jobs:
           Workflow: ${{ github.workflow }}
           Run Number: ${{ github.run_number }}
           Run ID: ${{ github.run_id }}
-
+          
           Please check the GitHub Actions logs for more details:
           ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           """
